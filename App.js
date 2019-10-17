@@ -1,30 +1,38 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Button, TextInput } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  TextInput,
+  FlatList
+} from "react-native";
+import GoalItem from "./components/GoalItem";
+import GoalInput from "./components/GoalInput";
 
 export default function App() {
-  const [enteredGoal, setEnteredGoal] = useState("");
   const [goals, setGoals] = useState([]);
+
+  // delete goal
+  const deleteHandler = id => {
+    setGoals(currentGoals => {
+      return currentGoals.filter(goal => goal.id !== id);
+    });
+  };
 
   return (
     <View style={styles.screen}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Course Goal"
-          style={styles.inputContainer}
-          onChangeText={text => setEnteredGoal(text)}
-        />
-        <Button
-          title="ADD"
-          onPress={() =>
-            setGoals(currentGoals => [...currentGoals, enteredGoal])
-          }
-        />
-      </View>
-      <View>
-        {goals.map((goal, i) => (
-          <Text key={i}>{goal}</Text>
-        ))}
-      </View>
+      <GoalInput setGoals={setGoals} />
+      <FlatList
+        keyExtractor={(item, index) => item.id}
+        data={goals}
+        renderItem={itemData => (
+          <GoalItem
+            title={itemData.item.goal}
+            onDelete={deleteHandler.bind(this, itemData.item.id)}
+          />
+        )}
+      />
     </View>
   );
 }
@@ -32,16 +40,5 @@ export default function App() {
 const styles = StyleSheet.create({
   screen: {
     padding: 50
-  },
-  inputContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  input: {
-    borderColor: "black",
-    borderWidth: 1,
-    padding: 10,
-    width: "80%"
   }
 });
